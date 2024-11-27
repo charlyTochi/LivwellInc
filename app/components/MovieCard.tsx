@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, Image, TouchableOpacity } from "react-native";
+import { View, Text, Image, TouchableOpacity, Platform } from "react-native";
 import { useColorScheme } from "react-native";
 
 export interface MovieCardProps {
@@ -25,7 +25,18 @@ const MovieCard: React.FC<MovieCardProps> = ({ movie, onPress }) => {
   return (
     <TouchableOpacity
       onPress={onPress}
-      className={`flex flex-row rounded-lg shadow-md m-2 p-3 ${
+      style={[
+        // Android uses elevation
+        { elevation: 5 },
+        // iOS uses shadow properties
+        Platform.OS === "ios" && {
+          shadowColor: "#000",
+          shadowOpacity: 0.2,
+          shadowOffset: { width: 0, height: 2 },
+          shadowRadius: 5,
+        },
+      ]}
+      className={`flex flex-row rounded-lg m-2 p-3 ${
         isDarkMode ? "bg-gray-800" : "bg-white"
       }`}
     >

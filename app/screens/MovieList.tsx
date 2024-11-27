@@ -4,6 +4,8 @@ import {
   ActivityIndicator,
   FlatList,
   Text,
+  Alert,
+  useColorScheme,
 } from "react-native";
 import { useEffect, useState } from "react";
 import SearchBar from "@/app/components/SearchBar";
@@ -23,6 +25,8 @@ interface Movie {
 }
 
 export default function MovieList() {
+  const colorScheme = useColorScheme(); // Get the current theme (light or dark)
+  const isDarkMode = colorScheme === "dark";
   const [movies, setMovies] = useState<Movie[]>([]);
   const [filteredMovies, setFilteredMovies] = useState<Movie[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
@@ -45,8 +49,6 @@ export default function MovieList() {
     setLoading(true);
 
     try {
-      console.log("making the api call");
-
       const response = await fetch(url, options);
       const data = await response.json();
       if (data.results) {
@@ -57,7 +59,7 @@ export default function MovieList() {
         setHasMore(data.results.length > 0); // If there are no results, set hasMore to false
       }
     } catch (error) {
-      console.error("Failed to fetch movies:", error);
+      Alert.alert(`Failed to fetch movies: ${error}`);
     } finally {
       setLoading(false);
     }
@@ -88,7 +90,9 @@ export default function MovieList() {
   };
 
   return (
-    <View className="flex-1 bg-white pl-4 pr-4">
+    <View
+      className={`flex-1 pl-4 pr-4 ${isDarkMode ? "bg-gray-800" : "bg-white"}`}
+    >
       {loading && page === 1 ? (
         <ActivityIndicator size="large" className="mt-4" />
       ) : (
