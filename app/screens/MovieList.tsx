@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import SearchBar from "@/app/components/SearchBar";
 import MovieCard from "@/app/components/MovieCard";
 import React from "react";
+import { Token } from "@/constants/Enums";
 
 interface Movie {
   id: number;
@@ -37,8 +38,7 @@ export default function MovieList() {
       method: "GET",
       headers: {
         accept: "application/json",
-        Authorization:
-          "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI5OTRjODNiNTJmZmNiY2Q4NzI2ZmM5ZWQ1ZGQ5MTFkYSIsIm5iZiI6MTczMjYyMTY5Ny43ODg1MjMyLCJzdWIiOiI2NzQ1YjQ0OTZlZWY1YjQzYTVmYzlkOTMiLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.WVeOfp9O1oFSyrDRwV_gpQ9lbA9R1KdlpHKWV-MGJpY",
+        Authorization: `Bearer ${Token} `,
       },
     };
 
