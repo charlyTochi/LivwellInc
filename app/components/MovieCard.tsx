@@ -1,6 +1,13 @@
 import React from "react";
-import { View, Text, Image, TouchableOpacity, Platform } from "react-native";
-import { useColorScheme } from "react-native";
+import {
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+  useColorScheme,
+  Platform,
+} from "react-native";
+import AnimatedViewWrapper from "./AnimatedViewWrapper";
 
 export interface MovieCardProps {
   movie: {
@@ -20,58 +27,52 @@ const MovieCard: React.FC<MovieCardProps> = ({ movie, onPress }) => {
   const colorScheme = useColorScheme(); // Get the current theme (light or dark)
   const isDarkMode = colorScheme === "dark";
   const posterUrl = `https://image.tmdb.org/t/p/w500${movie.poster_path}`;
-  const releaseYear = movie.release_date?.split("-")[0]; // Extract release year
+  const releaseYear = movie.release_date?.split("-")[0];
 
   return (
-    <TouchableOpacity
-      onPress={onPress}
-      style={[
-        // Android uses elevation
-        { elevation: 5 },
-        // iOS uses shadow properties
-        Platform.OS === "ios" && {
-          shadowColor: "#000",
-          shadowOpacity: 0.2,
-          shadowOffset: { width: 0, height: 2 },
-          shadowRadius: 5,
-        },
-      ]}
-      className={`flex flex-row rounded-lg m-2 p-3 ${
-        isDarkMode ? "bg-gray-800" : "bg-white"
-      }`}
+    <AnimatedViewWrapper
+      animation="fadeInUp"
+      duration={2000}
+      className="m-2"
+      delay={0 * 100}
+      key={0}
     >
-      {/* Poster Image */}
-      <Image source={{ uri: posterUrl }} className="h-32 w-24 rounded-lg" />
-
-      {/* Movie Details */}
-      <View className="flex-1 ml-4 justify-between">
-        {/* Title */}
-        <Text
-          className={`text-lg font-bold ${isDarkMode ? "text-white" : "text-black"}`}
-        >
-          {movie.title}
-        </Text>
-
-        {/* Rating */}
-        <Text className="text-yellow-500 text-sm">
-          ⭐ {movie.vote_average.toFixed(1)}
-        </Text>
-
-        {/* Genres */}
-        <Text
-          className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-500"}`}
-        >
-          Release Year: {releaseYear || "N/A"}
-        </Text>
-
-        {/* Runtime */}
-        <Text
-          className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-500"}`}
-        >
-          {movie.vote_count} votes
-        </Text>
-      </View>
-    </TouchableOpacity>
+      <TouchableOpacity
+        onPress={onPress}
+        style={[
+          // Android uses elevation
+          { elevation: 5 },
+          // iOS uses shadow properties
+          Platform.OS === "ios" && {
+            shadowColor: "#000",
+            shadowOpacity: 0.2,
+            shadowOffset: { width: 0, height: 2 },
+            shadowRadius: 5,
+          },
+        ]}
+        className={`flex flex-row rounded-lg shadow-lg p-3 ${
+          isDarkMode ? "bg-black" : "bg-white"
+        }`}
+      >
+        <Image source={{ uri: posterUrl }} className="h-32 w-24 rounded-lg" />
+        <View className="flex-1 ml-4 justify-between">
+          <Text
+            className={`text-lg font-bold ${
+              isDarkMode ? "text-white" : "text-black"
+            }`}
+          >
+            {movie.title}
+          </Text>
+          <Text className="text-yellow-500">
+            ⭐ {movie.vote_average.toFixed(1)}
+          </Text>
+          <Text className="text-gray-500">
+            Release Year: {releaseYear || "N/A"}
+          </Text>
+          <Text className="text-gray-500">{movie.vote_count} votes</Text>
+        </View>
+      </TouchableOpacity>
+    </AnimatedViewWrapper>
   );
 };
 
