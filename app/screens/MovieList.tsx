@@ -3,74 +3,21 @@ import {
   View,
   ActivityIndicator,
   FlatList,
-  Text,
-  Alert,
   useColorScheme,
 } from "react-native";
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import SearchBar from "@/app/components/SearchBar";
 import MovieCard from "@/app/components/MovieCard";
 import React from "react";
-import { Token } from "@/constants/Enums";
-
-interface Movie {
-  id: number;
-  title: string;
-  release_date?: string | undefined;
-  vote_average: number;
-  vote_count: number;
-  poster_path: string;
-  genres?: string[];
-  runtime?: number;
-}
+import useFetchMovies from "@/hooks/useFetchMovies";
 
 export default function MovieList() {
-  const colorScheme = useColorScheme(); // Get the current theme (light or dark)
+  const colorScheme = useColorScheme();
   const isDarkMode = colorScheme === "dark";
-  const [movies, setMovies] = useState<Movie[]>([]);
-  const [filteredMovies, setFilteredMovies] = useState<Movie[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [page, setPage] = useState<number>(1);
-  const [hasMore, setHasMore] = useState<boolean>(true);
+  const { movies, loading, hasMore, fetchMoreMovies } = useFetchMovies();
+  const [filteredMovies, setFilteredMovies] = useState(movies);
   const [searchQuery, setSearchQuery] = useState<string>("");
 
-  // Fetching movies function using the fetch API
-  const fetchMovies = async (page: number) => {
-    const url = `https://api.themoviedb.org/3/discover/movie?page=${page}`;
-
-    const options = {
-      method: "GET",
-      headers: {
-        accept: "application/json",
-        Authorization: `Bearer ${Token} `,
-      },
-    };
-
-    setLoading(true);
-
-    try {
-      const response = await fetch(url, options);
-      const data = await response.json();
-      if (data.results) {
-        console.log(data.results);
-
-        // Append new movies to the existing list if we're fetching next page
-        setMovies((prevMovies) => [...prevMovies, ...data.results]);
-        setHasMore(data.results.length > 0); // If there are no results, set hasMore to false
-      }
-    } catch (error) {
-      Alert.alert(`Failed to fetch movies: ${error}`);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Load movies when the page changes
-  useEffect(() => {
-    fetchMovies(page);
-  }, [page]);
-
-  // Filter movies based on search query
   useEffect(() => {
     if (searchQuery) {
       const filtered = movies.filter((movie) =>
@@ -82,18 +29,11 @@ export default function MovieList() {
     }
   }, [searchQuery, movies]);
 
-  // Trigger next page on scroll for infinite scrolling
-  const loadNextPage = () => {
-    if (hasMore && !loading) {
-      setPage((prev) => prev + 1);
-    }
-  };
-
   return (
     <View
       className={`flex-1 pl-4 pr-4 ${isDarkMode ? "bg-gray-800" : "bg-white"}`}
     >
-      {loading && page === 1 ? (
+      {loading && movies.length === 0 ? (
         <ActivityIndicator size="large" className="mt-4" />
       ) : (
         <>
@@ -107,12 +47,12 @@ export default function MovieList() {
 
           <FlatList
             data={filteredMovies}
-            keyExtractor={(item, index) => `${item.id}-${page}-${index}`}
+            keyExtractor={(item) => `${item.id}`}
             renderItem={({ item }) => <MovieCard movie={item} />}
-            onEndReached={loadNextPage}
+            onEndReached={fetchMoreMovies}
             onEndReachedThreshold={0.5}
             ListFooterComponent={
-              loading && page > 1 ? (
+              loading && movies.length > 0 ? (
                 <ActivityIndicator className="mt-4" />
               ) : null
             }
